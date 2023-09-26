@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
+import 'package:task_2c/screens/product_screen.dart';
 import '../data/models/product_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 class ListScreen extends StatefulWidget {
@@ -18,14 +19,18 @@ class _ListScreenState extends State<ListScreen> {
     final res =
     await http.get(Uri.parse('https://dummyjson.com/products'));
     List<ProductData> dataA =[];
-
-    {
-    Map<String,dynamic> responseData = jsonDecode(res.body);
-    for (var item in  responseData   ['products']){
-      dataA.add(ProductData.fromJson(item));
+    try {
+      {
+        Map<String, dynamic> responseData = jsonDecode(res.body);
+        for (var item in responseData ['products']) {
+          dataA.add(ProductData.fromJson(item));
+        }
       }
+      return dataA;
+    }catch (e){
+      print((e));
+      return dataA;
     }
-    return dataA;
   }
   @override
   void initState()
@@ -67,56 +72,67 @@ class _ListScreenState extends State<ListScreen> {
         child: GridView.builder(
           itemCount: myList.length,
           itemBuilder: (context, index){
-            return Container(
-              height: MediaQuery.of(context).size.height *0.2,
-             width: MediaQuery.of(context).size.width *0.4,
-              decoration:  BoxDecoration(
-                color: const Color(0xFFFFFFFF),
-                borderRadius: BorderRadius.circular(30),
-                  image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: Image.network(myList[index].images,
-                        fit: BoxFit.fill,).image
-                  )
-              ),
-              alignment:Alignment.bottomCenter ,
+            return InkWell(
+              onTap: (){
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context)=>  ProductScreen(
+                  dataS: myList[index] ,
+                ),
+                )
+                );
 
-
-              margin: const EdgeInsets.all(10),
+              },
               child: Container(
-                height: 50,
-                width: double.infinity,
+                height: MediaQuery.of(context).size.height *0.2,
+               width: MediaQuery.of(context).size.width *0.4,
+                decoration:  BoxDecoration(
+                  color: const Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.circular(30),
+                    image: DecorationImage(
+                        fit: BoxFit.fill,
+                        image: Image.network(myList[index].images,
+                          fit: BoxFit.fill,).image
+                    )
+                ),
+                alignment:Alignment.bottomCenter ,
 
-                decoration: const BoxDecoration(
-                  color:Color(0xFF252837 ) ,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight:Radius.circular(30),
-                )),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
 
-                  Expanded(
-                    child:   Text(
-                  myList[index].name
-             ,  style: const TextStyle(fontSize: 15,color:
-                  Colors.white,fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.fade,
-                  ),
-                  ),
-                 Expanded(child:
-                    Text(
-                    '${myList[index].price.toString()}\$',
-                    style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.white,fontWeight: FontWeight.bold
+                margin: const EdgeInsets.all(10),
+                child: Container(
+                  height: 50,
+                  width: double.infinity,
+
+                  decoration: const BoxDecoration(
+                    color:Color(0xFF252837 ) ,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight:Radius.circular(30),
+                  )),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+
+                    Expanded(
+                      child:   Text(
+                    myList[index].name
+               ,  style: const TextStyle(fontSize: 15,color:
+                    Colors.white,fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.fade,
                     ),
                     ),
-                 )
+                   Expanded(child:
+                      Text(
+                      '${myList[index].price.toString()}\$',
+                      style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,fontWeight: FontWeight.bold
+                      ),
+                      ),
+                   )
 
 
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
